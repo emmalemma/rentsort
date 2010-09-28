@@ -8,7 +8,7 @@
 										@log "error:"
 										console.log error
 										@respond null
-
+										
 @$get_current_user =->
 	return @respond null if not @sessid 
 	@Users.by_sessid {key:@_sessid}, (err, doc)=>

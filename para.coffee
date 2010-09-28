@@ -1,20 +1,24 @@
-console.log 
-"running coffig"
 path = require 'path'
 @Config = 
+	paradigm_version: "0.2.0"
+	
 	port: 			8007
-	app_dir:		dir= 			'/Users/adrian/Projects/rentsort'
+	app_dir:		dir= 			'/Users/admin/Downloads/rentsort'
 	private_dir: 	path.join dir, 	'private'
 	public_dir: 	path.join dir, 	'public'
 	client_cs_dir: 	path.join dir, 	'private/cs/'
 	client_js_dir: 	path.join dir, 	'public/js/'
 	server_code: 	path.join dir, 	"rentsort.coffee"
+	
+	middlewares: ["sessions"]
+	
 	db:
 		adapter: 	'couchdb'
 		host: 		'localhost'
 		port: 		5984
 		name: 		''
 		views: 		path.join dir, 	"views.coffee"
+		
 	watcher:
 		dir:		dir
 		verbose: 	no
