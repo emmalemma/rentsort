@@ -1,0 +1,26 @@
+<div id="signup_box">
+We only have four questions for you:
+<form id="signup_form">
+	Where do you live? <input id="home_field" type="text" length=100></input><br />
+	Where do you work? <input id="work_field" type="text" width=100></input><br />
+	How much is your rent? <input id="rent_field" type="text" width=10></input><br />
+	What's your email? <input id="email_field" type="text"></input><br />
+	<span id="savebutton" >Sign up!</span>
+</form>
+{$ $('savebutton').addEvent 'click', ()->submitSignup() $}
+{%
+	submitSignup =->
+					$signup 
+							home: $('home_field').value
+							work: $('work_field').value
+							rent: $('rent_field').value
+							email: $('email_field').value
+							callback: (data) ->
+												if data.success
+													loadPartial '_home.html'
+												else
+													flashErrors data.errors
+	
+	flashErrors =(errors)-> console.log errors
+%}
+</div>

@@ -1,13 +1,23 @@
 #functions executed on server go here
 
-@$get_profile =(id)->
-	@Users.getDoc id, (err, doc) =>
-									if doc
-										@respond doc
-									else
-										@log "error:"
-										console.log error
-										@respond null
+@$signup =(params)->
+	doc =
+		sessid: @Session.id
+	
+	(doc[k] = params[k]) for k of params
+	console.log doc
+			
+	@Users.saveDoc params.email or no, doc, (err, doc) =>
+		if err
+			console.log err
+			switch err.error
+				when "forbidden"	then @respond {errors: err.reason}
+				when "conflict"		then @respond {errors: "That email address is already taken."}
+				
+		else
+			console.log doc
+			@respond {success: true}
+
 										
 @$get_current_user =->
 	return @respond null if not @sessid 
