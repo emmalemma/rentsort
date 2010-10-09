@@ -1,4 +1,21 @@
 #functions executed on server go here
+ 
+@$logout =->
+	@Users.by_sessid {key:@Session.id}, (err, doc)=>
+		console.log "logging out..."
+		console.log err
+		console.log doc
+		if doc and doc.rows.length > 0
+			newDoc = doc.rows[0].value
+			delete newDoc.sessid
+			console.log newDoc
+			@Users.saveDoc newDoc, (err, doc)=>
+												console.log "saving..."
+												console.log err
+												console.log doc
+												@respond @Session.clear()
+		else											
+			@respond @Session.clear()
 
 @$signup =(params)->
 	doc =
@@ -6,29 +23,34 @@
 	
 	(doc[k] = params[k]) for k of params
 	console.log doc
-			
+	
+	return @respond {error: "Please provide an email address."} unless doc.email
+	delete doc.email
 	@Users.saveDoc params.email or no, doc, (err, doc) =>
 		if err
-			console.log err
+			#console.log err
 			switch err.error
-				when "forbidden"	then @respond {errors: err.reason}
-				when "conflict"		then @respond {errors: "That email address is already taken."}
+				when "forbidden"	then @respond {error: err.reason}
+				when "conflict"		then @respond {error: "That email address is already taken."}
 				
 		else
 			console.log doc
 			@respond {success: true}
 
 										
-@$get_current_user =->
-	return @respond null if not @sessid 
-	@Users.by_sessid {key:@_sessid}, (err, doc)=>
+@$getCurrentUser =->
+	return @respond {error: "No session id detected. Do you have cookies enabled?"} unless @Session.id 
+	@Users.by_sessid {key:@Session.id}, (err, doc)=>												# 
+													# console.log "Searching for user."
+													# console.log err
+													# console.log doc
 												if doc 
 													if doc.rows.length > 0
-														@respond doc.rows[0].id
+														@respond {success: true, user: doc.rows[0].value}
 													else
-														@respond null
+														@respond {error: "No user found. Please log in."}
 												else
-													console.log "Err:#{err}"
+													@respond {error: err}
 						
 @$validate_user_email =(email_string)->
 	if not ematch = email_string.match(/\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i)
