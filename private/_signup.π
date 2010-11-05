@@ -1,0 +1,91 @@
+
+{% $getCurrentUser callback: (data)-> loadPartial '_home' if data.user %}
+
+<div id="signup_box">
+We only have four questions for you:
+<form id="signup_form">
+	<span id="error"></span><br />
+	<div id="home">Where do you live? <input class="field" type="text" length=100></input><span class="gps"></span><br />
+	<span class="address"></span><br />
+	</div>
+	<div id="work">Where do you work? <input class="field" type="text" length=100></input><span class="gps"></span><br />
+	<span class="address"></span><br />
+	</div>
+	How much is your rent? <input id="rent_field" type="text" width=10></input><br />
+	What is your email? <input id="email_field" type="text"></input><br />
+	<span id="savebutton" >Sign up!</span>
+</form>
+{$ $('savebutton').addEvent 'click', ()->submitSignup() $}
+{%
+	locOb =(id)-> 
+				display: 	$pi.locations[id].formatted_address
+				query:		$$("##{id} .field").value
+				gps:		
+					lat:	$pi.locations[id].geometry.location.lat()
+					lng:	$pi.locations[id].geometry.location.lng()
+
+	submitSignup =->
+					clearError()
+					$signup 
+							home: locOb "home"
+							work: locOb "work"
+							rent: parseInt($('rent_field').value)
+							email: $('email_field').value
+							callback: (data) ->
+												if data.success
+													loadPartial '_home'
+												else
+													flashError data.error
+	
+	flashError =(error)-> $('error').set 'text', error
+	clearError =-> $('error').set 'text', ''
+%}
+</div>
+{%
+#maps!
+
+			
+Asset.javascript "http://www.google.com/jsapi?key=ABCDEFG&callback=loadMaps"
+loadMaps =-> google.load 'maps', '3.1', callback: mapsLoaded, other_params: "sensor=false"
+mapsLoaded =-> 
+				$pi.geocoder = new google.maps.Geocoder()
+				$pi.map_options =
+							mapTypeId: google.maps.MapTypeId.ROADMAP
+							zoom: 15
+mapGoTo =(latlng)-> 		
+			unless $pi.map
+				$pi.map_options.center = latlng
+				$pi.map = new google.maps.Map($('map'), $pi.map_options)
+			else
+				$pi.map.panTo latlng
+
+#geolocate to ballpark it
+navigator.geolocation.getCurrentPosition (position)->
+														$pi.position = position
+														$pi.latlng = new google.maps.LatLng position.coords.latitude, position.coords.longitude
+														#set bounds to point location
+														$pi.bounds = new google.maps.LatLngBounds $pi.latlng, $pi.latlng
+														
+														mapGoTo $pi.latlng
+
+
+#stream map to your screen
+$$('#home input', '#work input').addEvent 'keypress', (event)->
+	$pi.geocoder.geocode {address: this.value, bounds: $pi.bounds}, (results, status) => 
+		if status == "OK"
+			div = this.getParent()
+			result = results[0]
+			$pi.locations = {} unless $pi.locations
+			$pi.locations[div.id] = result
+			
+			mapGoTo result.geometry.location
+			
+			div.getElement('.address').set 'text', result.formatted_address
+			div.getElement('.gps').set 'text', result.geometry.location.toString()
+			
+			
+
+%}
+
+<div id="map">
+</div>
