@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src='js/mootools.js'> </script>
+		<script src='js/mootools-more.js'> </script>
+		
+		<script src="js/middlewares/init.js"> </script>
+		<script src="js/middlewares/functions.js"> </script>
+		<link rel="stylesheet" type="text/css" href="css/rentsort.css" />
+		
+		{%
+			$pi = {}
+			partial_loader = new Request.HTML update: 'container', method: 'get'
+			loadPartial =(url)-> 
+								$pi = {}
+								partial_loader.send url: url
+								location.hash = "#!#{url}"
+								
+			if m = location.hash.match /^#\!(_.+)$/
+				loadPartial "#{m[1]}"
+			else
+				loadPartial '_signup'
+				
+			$getCurrentUser callback: (data)-> loadPartial '_home' if data.user
+		%}
+	</head>
+	
+	<body>
+		<div id="container">
+		</div>
+	</body>
+</html>

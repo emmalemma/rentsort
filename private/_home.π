@@ -1,0 +1,35 @@
+{%
+$getCurrentUser callback: (data)->
+									unless data.user
+										loadPartial '_index.html'
+									else
+										user = data.user
+										for field of user
+											$$("#user_details ##{field}").set 'text', data.user[field]
+										$$("#user_details #home").set 'text', user.home.display	
+										$$("#user_details #work").set 'text', user.work.display
+										
+%}
+
+<div id="user_details">
+	<div>Your email: <span id="_id"></span></div>
+	<div>Your home: <span id="home"></span></div>
+	<div>Your work: <span id="work"></span></div>
+	<div>Your rent: <span id="rent"></span></div>
+</div>
+
+<span id="logout">Log out.</span>
+{%
+	$('logout').addEvent 'click', -> $logout callback: -> loadPartial '_index'
+%}
+
+
+<span id="load">Load matches.</span>
+{%
+	$('load').addEvent 'click', -> $findMatches callback: loadMatches
+	
+	loadMatches =(data)->
+		console.log data
+%}
+<div id="matches">
+</div>
