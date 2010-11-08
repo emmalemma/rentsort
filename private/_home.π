@@ -4,10 +4,14 @@ $getCurrentUser callback: (data)->
 										loadPartial '_index.html'
 									else
 										user = data.user
+										console.log 
+													loaded_user: user
 										for field of user
 											$$("#user_details ##{field}").set 'text', data.user[field]
 										$$("#user_details #home").set 'text', user.home.display	
 										$$("#user_details #work").set 'text', user.work.display
+										if user.matches?
+											loadMatches user.matches
 										
 %}
 
@@ -24,23 +28,13 @@ $getCurrentUser callback: (data)->
 %}
 
 
-<span id="load">Load matches.</span>
-{%
-	$('load').addEvent 'click', -> $findMatches callback: loadMatches
-	
-	loadMatches =(data)->
-		console.log data
-%}
-{%
-	$matches callback: (result)->
-								console.log {result_of_matches: result}
-								return if result.error
-								for match in result.matches
-									console.log "Distance: #{match.distance} Rent: #{match.rent}"
-									console.log $('matches')
-									$('matches').grab(new Element('div', {text: "Distance: #{match.distance} Rent: #{match.rent}"}))
-%}
 
 <div id="matches">
+{%	
+	loadMatches =(matches)->
+		for match in matches
+			$('matches').grab new Element 'div', 
+												text: "Distance: #{match.distance} Rent: #{match.rent}"
+%}
 </div>
 

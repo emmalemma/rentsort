@@ -1,7 +1,7 @@
 #functions executed on server go here
  
 @$logout =->
-	@Users.by_sessid {key:@Session.id}, (err, doc)=>
+	@Models.Users.by_sessid {key:@Session.id}, (err, doc)=>
 		console.log "logging out..."
 		console.log err
 		console.log doc
@@ -46,7 +46,7 @@
 																							lat: match.home.gps.lat + Math.random()*.1
 																							lng: match.home.gps.lng + Math.random()*.1
 																							
-																		@Users.saveDoc user, (err, doc) => 
+																		@Models.Users.saveDoc user, (err, doc) => 
 																										if err and err.error == 'conflict'
 																											@log "saving failed, retrying"
 																											addMatch me, match #if at first you don't succeed...
