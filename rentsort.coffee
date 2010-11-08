@@ -18,8 +18,15 @@ path = require 'path'
 		views: 		path.join dir, 	"views.coffee"
 		
 	middlewares:
+		functions:
+			match:		/^\/\$\/(.+)/
+			prefix:		'\$'
+			client:		yes
+			
 		sessions:
-			client: yes
+			client: 	yes
+
+		paperboy:  	true
 		
 		
 @Watcher =
