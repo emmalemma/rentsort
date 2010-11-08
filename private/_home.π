@@ -31,5 +31,16 @@ $getCurrentUser callback: (data)->
 	loadMatches =(data)->
 		console.log data
 %}
+{%
+	$matches callback: (result)->
+								console.log {result_of_matches: result}
+								return if result.error
+								for match in result.matches
+									console.log "Distance: #{match.distance} Rent: #{match.rent}"
+									console.log $('matches')
+									$('matches').grab(new Element('div', {text: "Distance: #{match.distance} Rent: #{match.rent}"}))
+%}
+
 <div id="matches">
 </div>
+

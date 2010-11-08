@@ -9,12 +9,17 @@
 			newDoc = doc.rows[0].value
 			delete newDoc.sessid
 			console.log newDoc
-			@Users.saveDoc newDoc, (err, doc)=>
+			@Models.Users.saveDoc newDoc, (err, doc)=>
 												@respond @Session.clear()
 		else											
 			@respond @Session.clear()
 
-@findMatches =()->
+@$matches =()->
+	currentUser.bind(@) (err, user)=>
+							@respond {error: err} unless user
+							@respond {success: true, matches: user.matches}
+							
+@$findMatches =()->
 	currentUser.bind(@) (err, user)=>
 							@respond {error: err} unless user
 							@respond {error: "No gps data for current user's work."} unless user.work and user.work.gps
@@ -24,16 +29,13 @@
 							
 							unless user.distance 
 								user.distance = distance(user.work.gps, user.home.gps)
-								@Users.saveDoc user
+								@Models.Users.saveDoc user
 								
-							@Users.ids (err, doc)=>
+							@Models.Users.ids (err, doc)=>
 								@respond {error: err} unless doc
 								
 								addMatch =(me, match)=>
-									console.log
-										me: me
-										match: match
-									@Users.getDoc me._id, (err, user)=> 
+									@Models.Users.getDoc me._id, (err, user)=> 
 																		return unless user
 																		user.matches = [] unless user.matches
 																		user.matches.push
@@ -53,7 +55,7 @@
 								
 								for row in doc.rows
 									unless row.id == user._id #we don't want to match ourselves... is that even possible?
-										@Users.getDoc row.id, (err, other) =>	
+										@Models.Users.getDoc row.id, (err, other) =>	
 																		return if err
 																		return unless other.home and other.home.gps
 																		console.log
@@ -84,7 +86,7 @@
 	
 	return @respond {error: "Please provide an email address."} unless doc.email
 	delete doc.email
-	@Users.saveDoc params.email or no, doc, (err, doc) =>
+	@Models.Users.saveDoc params.email or no, doc, (err, doc) =>
 		if err
 			console.log err
 			switch err.error
@@ -102,7 +104,6 @@
 	else
 	currentUser.bind(@) (err, user) => 
 											if user
-												console.log(user)
 												@respond {success: true, user: user}
 											else
 												console.log(err)
@@ -110,7 +111,7 @@
 
 currentUser =(callback)->
 	return callback({error: "no sessid set"}, null) unless @Session and @Session.id 
-	@Users.by_sessid {key:@Session.id}, (err, doc)=>
+	@Models.Users.by_sessid {key:@Session.id}, (err, doc)=>
 												return callback({error: err}, null) unless doc
 												if doc.rows.length > 0
 													callback(null, doc.rows[0].value)
