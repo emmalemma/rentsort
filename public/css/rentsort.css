@@ -1,0 +1,35 @@
+#container {
+	margin: 2em;
+	padding: 2em;
+	border: thin black solid;
+	width: 900px;
+	height: 500px;
+}
+
+#login {
+	width: 200px;
+	float: left;
+}
+
+#signup {
+	width: 200px;
+	float: left;
+}
+
+
+#signup_box {
+	width: 400px;
+	float: left;
+}
+
+.gps {
+	font-size: 9pt;
+	color: gray;
+}
+
+#map {
+	width: 400px;
+	height: 400px;
+	float: right;
+	border: 1px solid black;
+}
