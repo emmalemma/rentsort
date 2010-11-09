@@ -19,7 +19,7 @@
 							@respond {error: err} unless user
 							@respond {success: true, matches: user.matches}
 							
-@$findMatches =()->
+findMatches =()->
 	currentUser.bind(@) (err, user)=>
 							@respond {error: err} unless user
 							@respond {error: "No gps data for current user's work."} unless user.work and user.work.gps
@@ -67,7 +67,7 @@
 																			if distance(user.home.gps, other.work.gps) < other.distance or other.distance = distance(other.home.gps, other.work.gps)
 																				addMatch user, other
 																				addMatch other, user
-								@respond {success: true}
+								#@respond {success: true}
 														
 							
 	
@@ -95,6 +95,7 @@
 				
 		else
 			console.log doc
+			findMatches.bind(@)()
 			@respond {success: true}
 
 										

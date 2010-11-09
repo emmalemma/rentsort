@@ -14,9 +14,6 @@ this.Users =
 			map: (doc) -> emit(null,null)
 	
 	validate_doc_update: (newDoc, oldDoc, userCtx)->		
-		
-		#this is what they look like
-		
 		is_location =(field)-> _like field,
 											display: 'string'
 											query: 	 'string'
